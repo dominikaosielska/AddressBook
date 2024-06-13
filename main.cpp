@@ -6,6 +6,12 @@
 
 using namespace std;
 
+struct Uzytkownik
+{
+    int id;
+    string login, haslo;
+};
+
 struct Adresat
 {
     int id;
@@ -41,6 +47,55 @@ char wczytajZnak()
         return 0;
     }
     return znak;
+}
+
+int rejestracja(vector <Uzytkownik> &uzytkownicy, int iloscUzytkownikow)
+{
+    system("cls");
+
+    Uzytkownik uzytkownik;
+    fstream plik;
+    plik.open("Uzytkownicy.txt", ios::out | ios::app);
+
+    string login, haslo;
+
+    if (plik.good() == true)
+    {
+        cout << ">>> REJESTRACJA <<<" << endl << endl;
+
+        cout << "Podaj nazwe uzytkownika: ";
+        login = wczytajLinie();
+
+        for(vector <Uzytkownik>:: iterator itr = uzytkownicy.begin(); itr != uzytkownicy.end(); itr++)
+        {
+            if(itr->login == login)
+            {
+                cout << "Taki uzytkownik istnieje. Wpisz inna nazwe uzytkownika: ";
+                login = wczytajLinie();
+                itr = uzytkownicy.begin();
+            }
+        }
+        cout << "Podaj haslo: ";
+        haslo = wczytajLinie();
+
+        uzytkownik.login = login;
+        uzytkownik.haslo = haslo;
+        uzytkownik.id = iloscUzytkownikow + 1;
+
+
+        plik << uzytkownik.id << '|';
+        plik << uzytkownik.login << '|';
+        plik << uzytkownik.haslo << '|' << endl;
+
+        plik.close();
+
+        uzytkownicy.push_back(uzytkownik);
+
+        cout << "Konto zalozone" << endl;
+        Sleep(1000);
+    }
+
+    return ++iloscUzytkownikow;
 }
 
 int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci)
@@ -375,9 +430,32 @@ int edytujAdresata(vector <Adresat> &adresaci)
 
 int main()
 {
+    vector <Uzytkownik> uzytkownicy;
     vector <Adresat> adresaci;
+    int iloscUzytkownikow;
     int iloscAdresatow;
     char wybor;
+
+    while(true)
+    {
+        system("cls");
+        cout << "1. Logowanie" << endl;
+        cout << "2. Rejestracja" << endl;
+        cout << "9. Zakoncz program" << endl;
+
+        wybor = wczytajZnak();
+
+        switch(wybor)
+        {
+        case '1':
+            break;
+        case '2':
+            iloscUzytkownikow = rejestracja(uzytkownicy, iloscUzytkownikow);
+            break;
+        case '9':
+            break;
+        }
+    }
 
     iloscAdresatow = wczytanieZPlikuAdresatow(adresaci);
 
