@@ -6,6 +6,12 @@
 
 using namespace std;
 
+struct Uzytkownik
+{
+    int id;
+    string login, haslo;
+};
+
 struct Adresat
 {
     int id;
@@ -41,6 +47,138 @@ char wczytajZnak()
         return 0;
     }
     return znak;
+}
+
+int wczytanieZPlikuUzytkownikow(vector <Uzytkownik> &uzytkownicy)
+{
+    Uzytkownik uzytkownik;
+    int iloscUzytkownikow = 0;
+    string linia = "";
+    int numerSlowa = 1;
+
+    fstream plik;
+    plik.open("Uzytkownicy.txt", ios::in);
+
+    if (plik.good() == false)
+    {
+        return iloscUzytkownikow;
+    }
+
+    while(getline(plik, linia))
+    {
+        stringstream ss (linia);
+
+        while (getline (ss, linia, '|'))
+        {
+            switch(numerSlowa)
+            {
+            case 1:
+                uzytkownik.id = stoi(linia);
+                if (iloscUzytkownikow < uzytkownik.id)
+                    iloscUzytkownikow = uzytkownik.id;
+                break;
+            case 2:
+                uzytkownik.login = linia;
+                break;
+            case 3:
+                uzytkownik.haslo = linia;
+                numerSlowa= 0;
+                break;
+            }
+            numerSlowa++;
+        }
+        uzytkownicy.push_back(uzytkownik);
+    }
+    plik.close();
+
+    return iloscUzytkownikow;
+}
+
+int logowanie(vector <Uzytkownik> &uzytkownicy, int iloscUzytkownikow)
+{
+    system("cls");
+
+    string login, haslo;
+
+    cout << ">>> LOGOWANIE <<<" << endl << endl;
+
+    cout << "Podaj login: ";
+    login = wczytajLinie();
+
+    for(Uzytkownik uzytkownik : uzytkownicy)
+    {
+        if(uzytkownik.login == login)
+        {
+            for (int proby = 0; proby < 3; proby++)
+            {
+                cout << "Podaj haslo. Pozostalo prob " << 3-proby << ": ";
+                haslo = wczytajLinie();
+                if (uzytkownik.haslo == haslo)
+                {
+                    cout << "Zalogowales sie" << endl;
+                    Sleep(1000);
+                    return uzytkownik.id;
+                }
+            }
+            cout << "Podales 3 razy bledne haslo. Poczekaj 3 sekundy przed kolejna proba" << endl;
+            Sleep(3000);
+            return 0;
+        }
+    }
+    cout << "Nie ma uzytkownika z takim loginem" << endl;
+    Sleep(1000);
+    return 0;
+
+
+}
+
+int rejestracja(vector <Uzytkownik> &uzytkownicy, int iloscUzytkownikow)
+{
+    system("cls");
+
+    Uzytkownik uzytkownik;
+    fstream plik;
+    plik.open("Uzytkownicy.txt", ios::out | ios::app);
+
+    string login, haslo;
+
+    if (plik.good() == true)
+    {
+        cout << ">>> REJESTRACJA <<<" << endl << endl;
+
+        cout << "Podaj nazwe uzytkownika: ";
+        login = wczytajLinie();
+
+        for(vector <Uzytkownik>:: iterator itr = uzytkownicy.begin(); itr != uzytkownicy.end(); itr++)
+        {
+            if(itr->login == login)
+            {
+                cout << "Taki uzytkownik istnieje. Wpisz inna nazwe uzytkownika: ";
+                login = wczytajLinie();
+                itr = uzytkownicy.begin() - 1;
+            }
+        }
+        cout << "Podaj haslo: ";
+        haslo = wczytajLinie();
+
+        uzytkownik.login = login;
+        uzytkownik.haslo = haslo;
+        uzytkownik.id = iloscUzytkownikow + 1;
+
+
+        plik << uzytkownik.id << '|';
+        plik << uzytkownik.login << '|';
+        plik << uzytkownik.haslo << '|' << endl;
+
+        plik.close();
+
+        uzytkownicy.push_back(uzytkownik);
+
+        cout << "Konto zalozone" << endl;
+        Sleep(1000);
+    }
+
+    return ++iloscUzytkownikow;
 }
 
 int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci)
@@ -375,9 +513,37 @@ int edytujAdresata(vector <Adresat> &adresaci)
 
 int main()
 {
+    vector <Uzytkownik> uzytkownicy;
     vector <Adresat> adresaci;
-    int iloscAdresatow;
+    int iloscUzytkownikow = 0;
+    int iloscAdresatow = 0;
+    int idZalogowanegoUzytkownika = 0;
     char wybor;
+
+    iloscUzytkownikow = wczytanieZPlikuUzytkownikow(uzytkownicy);
+
+    while(true)
+    {
+        system("cls");
+        cout << "1. Logowanie" << endl;
+        cout << "2. Rejestracja" << endl;
+        cout << "9. Zakoncz program" << endl;
+
+        wybor = wczytajZnak();
+
+        switch(wybor)
+        {
+        case '1':
+            idZalogowanegoUzytkownika = logowanie(uzytkownicy, iloscUzytkownikow);
+            break;
+        case '2':
+            iloscUzytkownikow = rejestracja(uzytkownicy, iloscUzytkownikow);
+            break;
+        case '9':
+            return 0;
+            break;
+        }
+    }
 
     iloscAdresatow = wczytanieZPlikuAdresatow(adresaci);
 
