@@ -14,7 +14,8 @@ struct Uzytkownik
 
 struct Adresat
 {
-    int id;
+    int idAdresata;
+    int idUzytkownika;
     string imie;
     string nazwisko;
     string numerTelefonu;
@@ -205,9 +206,9 @@ int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci)
             switch(numerSlowa)
             {
             case 1:
-                adresat.id = stoi(linia);
-                if (iloscAdresatow < adresat.id)
-                    iloscAdresatow = adresat.id;
+                adresat.idAdresata = stoi(linia);
+                if (iloscAdresatow < adresat.idAdresata)
+                    iloscAdresatow = adresat.idAdresata;
                 break;
             case 2:
                 adresat.imie = linia;
@@ -235,7 +236,7 @@ int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci)
     return iloscAdresatow;
 }
 
-int dodajAdresata(vector <Adresat> &adresaci, int iloscAdresatow)
+int dodajAdresata(vector <Adresat> &adresaci, int iloscAdresatow,  int idZalogowanegoUzytkownika)
 {
     system("cls");
 
@@ -247,7 +248,9 @@ int dodajAdresata(vector <Adresat> &adresaci, int iloscAdresatow)
     {
         cout << ">>> DODAWANIE OSOBY <<<" << endl << endl;
 
-        adresat.id = iloscAdresatow + 1;
+        adresat.idAdresata = iloscAdresatow + 1;
+
+        adresat.idUzytkownika = idZalogowanegoUzytkownika;
 
         cout << "Podaj imie: " << endl;
         adresat.imie = wczytajLinie();
@@ -265,7 +268,8 @@ int dodajAdresata(vector <Adresat> &adresaci, int iloscAdresatow)
         adresat.adres = wczytajLinie();
 
 
-        plik << adresat.id << '|';
+        plik << adresat.idAdresata << '|';
+        plik << adresat.idUzytkownika << '|';
         plik << adresat.imie << '|';
         plik << adresat.nazwisko << '|';
         plik << adresat.numerTelefonu << '|';
@@ -302,7 +306,7 @@ int wyszukajPoImieniu(vector <Adresat> adresaci, int iloscAdresatow)
     {
         if(adresat.imie == szukaneImie)
         {
-            cout << "ID: " << adresat.id << endl;
+            cout << "ID: " << adresat.idAdresata << endl;
             cout << "Imie: " << adresat.imie << endl;
             cout << "Nazwisko: " << adresat.nazwisko << endl;
             cout << "Numer telefonu: " << adresat.numerTelefonu << endl;
@@ -335,7 +339,7 @@ int wyszukajPoNazwisku(vector <Adresat> &adresaci, int iloscAdresatow)
     {
         if(adresat.nazwisko == szukaneNazwisko)
         {
-            cout << "ID: " << adresat.id << endl;
+            cout << "ID: " << adresat.idAdresata << endl;
             cout << "Imie: " << adresat.imie << endl;
             cout << "Nazwisko: " << adresat.nazwisko << endl;
             cout << "Numer telefonu: " << adresat.numerTelefonu << endl;
@@ -359,7 +363,7 @@ int wyswietlWszystkichAdresatow(vector <Adresat> &adresaci, int iloscAdresatow)
 
     for(Adresat adresat : adresaci)
     {
-        cout << "ID: " << adresat.id << endl;
+        cout << "ID: " << adresat.idAdresata << endl;
         cout << "Imie: " << adresat.imie << endl;
         cout << "Nazwisko: " << adresat.nazwisko << endl;
         cout << "Numer telefonu: " << adresat.numerTelefonu << endl;
@@ -380,7 +384,7 @@ void nadpiszPlik(vector <Adresat> &adresaci)
 
     for(Adresat adresat : adresaci)
     {
-        plik << adresat.id << '|';
+        plik << adresat.idAdresata << '|';
         plik << adresat.imie << '|';
         plik << adresat.nazwisko << '|';
         plik << adresat.numerTelefonu << '|';
@@ -403,7 +407,7 @@ int usunAdresata(vector <Adresat> &adresaci, int iloscAdresatow)
 
     for(vector <Adresat>:: iterator itr = adresaci.begin(); itr != adresaci.end(); itr++)
     {
-        if(itr->id == adresatDoUsuniecia)
+        if(itr->idAdresata == adresatDoUsuniecia)
         {
             adresaci.erase(itr);
             nadpiszPlik(adresaci);
@@ -435,7 +439,7 @@ int edytujAdresata(vector <Adresat> &adresaci)
 
     for(Adresat &adresat : adresaci)
     {
-        if(adresat.id == adresatDoEdycji)
+        if(adresat.idAdresata == adresatDoEdycji)
         {
             system("cls");
 
@@ -600,7 +604,7 @@ int main()
             switch(wybor)
             {
             case '1':
-                iloscAdresatow = dodajAdresata(adresaci, iloscAdresatow);
+                iloscAdresatow = dodajAdresata(adresaci, iloscAdresatow, idZalogowanegoUzytkownika);
                 break;
             case '2':
                 wyszukajPoImieniu(adresaci, iloscAdresatow);
