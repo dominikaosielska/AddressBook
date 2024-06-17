@@ -511,6 +511,39 @@ int edytujAdresata(vector <Adresat> &adresaci)
     return 0;
 }
 
+void zmienHaslo(vector <Uzytkownik> &uzytkownicy, int iloscUzytkownikow, int idZalogowanegoUzytkownika)
+{
+    string haslo;
+
+    system("cls");
+
+    cout << ">>> ZMIANA HASLA <<<" << endl << endl;
+    cout << "Podaj nowe haslo: ";
+    haslo = wczytajLinie();
+
+    for(Uzytkownik &uzytkownik : uzytkownicy)
+    {
+        if(uzytkownik.id == idZalogowanegoUzytkownika)
+        {
+            uzytkownik.haslo = haslo;
+            cout << "Haslo zostalo zmienione" << endl;
+            Sleep(1000);
+        }
+    }
+
+    ofstream plik;
+    plik.open("Uzytkownicy.txt", ofstream::trunc);
+
+    for(Uzytkownik uzytkownik : uzytkownicy)
+    {
+        plik << uzytkownik.id << '|';
+        plik << uzytkownik.login << '|';
+        plik << uzytkownik.haslo << endl;
+    }
+
+    plik.close();
+}
+
 int main()
 {
     vector <Uzytkownik> uzytkownicy;
@@ -524,70 +557,76 @@ int main()
 
     while(true)
     {
-        system("cls");
-        cout << "1. Logowanie" << endl;
-        cout << "2. Rejestracja" << endl;
-        cout << "9. Zakoncz program" << endl;
-
-        wybor = wczytajZnak();
-
-        switch(wybor)
+        if (idZalogowanegoUzytkownika == 0)
         {
-        case '1':
-            idZalogowanegoUzytkownika = logowanie(uzytkownicy, iloscUzytkownikow);
-            break;
-        case '2':
-            iloscUzytkownikow = rejestracja(uzytkownicy, iloscUzytkownikow);
-            break;
-        case '9':
-            return 0;
-            break;
+            system("cls");
+            cout << "1. Logowanie" << endl;
+            cout << "2. Rejestracja" << endl;
+            cout << "9. Zakoncz program" << endl;
+
+            wybor = wczytajZnak();
+
+            switch(wybor)
+            {
+            case '1':
+                idZalogowanegoUzytkownika = logowanie(uzytkownicy, iloscUzytkownikow);
+                break;
+            case '2':
+                iloscUzytkownikow = rejestracja(uzytkownicy, iloscUzytkownikow);
+                break;
+            case '9':
+                return 0;
+                break;
+            }
+
+            iloscAdresatow = wczytanieZPlikuAdresatow(adresaci);
         }
-    }
-
-    iloscAdresatow = wczytanieZPlikuAdresatow(adresaci);
-
-    while(true)
-    {
-        system("cls");
-        cout << ">>> KSIAZKA ADRESOWA <<<" << endl << endl;
-        cout << "1. Dodaj osobe" << endl;
-        cout << "2. Wyszukaj po imieniu" << endl;
-        cout << "3. Wyszukaj po nazwisku" << endl;
-        cout << "4. Wyswietl wszystkie osoby" << endl;
-        cout << "5. Usun adresata" << endl;
-        cout << "6. Edytuj adresata" << endl;
-        cout << "9. Zakoncz program" << endl;
-        cout << "Twoj wybor: ";
-
-        wybor = wczytajZnak();
-
-        switch(wybor)
+        else
         {
-        case '1':
-            iloscAdresatow = dodajAdresata(adresaci, iloscAdresatow);
-            break;
-        case '2':
-            wyszukajPoImieniu(adresaci, iloscAdresatow);
-            break;
-        case '3':
-            wyszukajPoNazwisku(adresaci, iloscAdresatow);
-            break;
-        case '4':
-            wyswietlWszystkichAdresatow(adresaci, iloscAdresatow);
-            break;
-        case '5':
-            iloscAdresatow = usunAdresata(adresaci, iloscAdresatow);
-            break;
-        case '6':
-            edytujAdresata(adresaci);
-            break;
-        case '9':
-            return 0;
-            break;
-        default:
-            cout << "Nie ma takiej opcji w menu" << endl;
-            Sleep(1000);
+            system("cls");
+            cout << ">>> KSIAZKA ADRESOWA <<<" << endl << endl;
+            cout << "1. Dodaj osobe" << endl;
+            cout << "2. Wyszukaj po imieniu" << endl;
+            cout << "3. Wyszukaj po nazwisku" << endl;
+            cout << "4. Wyswietl wszystkie osoby" << endl;
+            cout << "5. Usun adresata" << endl;
+            cout << "6. Edytuj adresata" << endl;
+            cout << "7. Zmien haslo" << endl;
+            cout << "9. Wyloguj sie" << endl;
+            cout << "Twoj wybor: ";
+
+            wybor = wczytajZnak();
+
+            switch(wybor)
+            {
+            case '1':
+                iloscAdresatow = dodajAdresata(adresaci, iloscAdresatow);
+                break;
+            case '2':
+                wyszukajPoImieniu(adresaci, iloscAdresatow);
+                break;
+            case '3':
+                wyszukajPoNazwisku(adresaci, iloscAdresatow);
+                break;
+            case '4':
+                wyswietlWszystkichAdresatow(adresaci, iloscAdresatow);
+                break;
+            case '5':
+                iloscAdresatow = usunAdresata(adresaci, iloscAdresatow);
+                break;
+            case '6':
+                edytujAdresata(adresaci);
+                break;
+            case '7':
+                zmienHaslo(uzytkownicy, iloscUzytkownikow, idZalogowanegoUzytkownika);
+                break;
+            case '9':
+                idZalogowanegoUzytkownika = 0;
+                break;
+            default:
+                cout << "Nie ma takiej opcji w menu" << endl;
+                Sleep(1000);
+            }
         }
     }
     return 0;
