@@ -190,7 +190,7 @@ int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci)
     int numerSlowa = 1;
 
     fstream plik;
-    plik.open("ksiazkaAdresowa.txt", ios::in);
+    plik.open("Adresaci.txt", ios::in);
 
     if (plik.good() == false)
     {
@@ -242,7 +242,7 @@ int dodajAdresata(vector <Adresat> &adresaci, int iloscAdresatow,  int idZalogow
 
     Adresat adresat;
     fstream plik;
-    plik.open("ksiazkaAdresowa.txt", ios::out | ios::app);
+    plik.open("Adresaci.txt", ios::out | ios::app);
 
     if (plik.good() == true)
     {
@@ -380,7 +380,7 @@ int wyswietlWszystkichAdresatow(vector <Adresat> &adresaci, int iloscAdresatow)
 void nadpiszPlik(vector <Adresat> &adresaci)
 {
     ofstream plik;
-    plik.open("ksiazkaAdresowa.txt", ofstream::trunc);
+    plik.open("Adresaci.txt", ofstream::trunc);
 
     for(Adresat adresat : adresaci)
     {
