@@ -1,0 +1,4 @@
+1|2|Pola|Osielska|123 345 567|pola@osielska.com|Osielsko 9|
+2|2|Jakub|Osielski|345 456 567|jakub@osielski.com|Jakubowo 9|
+3|1|Jakub|Osielski|678 789 789|jakub@osielski.com|Jakubo 3|
+4|2|Dominika|Osielska|123 456 789|dominika@osielska.con|Dominikowo 2|

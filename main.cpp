@@ -182,7 +182,7 @@ int rejestracja(vector <Uzytkownik> &uzytkownicy, int iloscUzytkownikow)
     return ++iloscUzytkownikow;
 }
 
-int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci)
+int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci, int idZalogowanegoUzytkownika)
 {
     Adresat adresat;
     int iloscAdresatow = 0;
@@ -207,29 +207,36 @@ int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci)
             {
             case 1:
                 adresat.idAdresata = stoi(linia);
-                if (iloscAdresatow < adresat.idAdresata)
-                    iloscAdresatow = adresat.idAdresata;
+//                if (iloscAdresatow < adresat.idAdresata)
+//                    iloscAdresatow = adresat.idAdresata;
                 break;
             case 2:
-                adresat.imie = linia;
+                adresat.idUzytkownika = stoi(linia);
                 break;
             case 3:
-                adresat.nazwisko = linia;
+                adresat.imie = linia;
                 break;
             case 4:
-                adresat.numerTelefonu = linia;
+                adresat.nazwisko = linia;
                 break;
             case 5:
-                adresat.email = linia;
+                adresat.numerTelefonu = linia;
                 break;
             case 6:
+                adresat.email = linia;
+                break;
+            case 7:
                 adresat.adres = linia;
                 numerSlowa= 0;
                 break;
             }
             numerSlowa++;
         }
-        adresaci.push_back(adresat);
+        if (adresat.idUzytkownika == idZalogowanegoUzytkownika)
+        {
+            iloscAdresatow++;
+            adresaci.push_back(adresat);
+        }
     }
     plik.close();
 
@@ -583,7 +590,7 @@ int main()
                 break;
             }
 
-            iloscAdresatow = wczytanieZPlikuAdresatow(adresaci);
+            iloscAdresatow = wczytanieZPlikuAdresatow(adresaci, idZalogowanegoUzytkownika);
         }
         else
         {
@@ -626,6 +633,7 @@ int main()
                 break;
             case '9':
                 idZalogowanegoUzytkownika = 0;
+                adresaci.clear();
                 break;
             default:
                 cout << "Nie ma takiej opcji w menu" << endl;
