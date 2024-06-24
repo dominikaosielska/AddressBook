@@ -182,12 +182,14 @@ int rejestracja(vector <Uzytkownik> &uzytkownicy, int iloscUzytkownikow)
     return ++iloscUzytkownikow;
 }
 
-int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci, int idZalogowanegoUzytkownika)
+int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci, int idZalogowanegoUzytkownika, int &iloscWszystkichAdresatow)
 {
     Adresat adresat;
     int iloscAdresatow = 0;
     string linia = "";
     int numerSlowa = 1;
+
+    iloscWszystkichAdresatow = 0;
 
     fstream plik;
     plik.open("Adresaci.txt", ios::in);
@@ -207,8 +209,7 @@ int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci, int idZalogowanegoUzytk
             {
             case 1:
                 adresat.idAdresata = stoi(linia);
-//                if (iloscAdresatow < adresat.idAdresata)
-//                    iloscAdresatow = adresat.idAdresata;
+                iloscWszystkichAdresatow++;
                 break;
             case 2:
                 adresat.idUzytkownika = stoi(linia);
@@ -243,7 +244,7 @@ int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci, int idZalogowanegoUzytk
     return iloscAdresatow;
 }
 
-int dodajAdresata(vector <Adresat> &adresaci, int iloscAdresatow,  int idZalogowanegoUzytkownika)
+int dodajAdresata(vector <Adresat> &adresaci, int &iloscWszystkichAdresatow, int iloscAdresatow,  int idZalogowanegoUzytkownika)
 {
     system("cls");
 
@@ -255,7 +256,7 @@ int dodajAdresata(vector <Adresat> &adresaci, int iloscAdresatow,  int idZalogow
     {
         cout << ">>> DODAWANIE OSOBY <<<" << endl << endl;
 
-        adresat.idAdresata = iloscAdresatow + 1;
+        adresat.idAdresata = ++iloscWszystkichAdresatow;
 
         adresat.idUzytkownika = idZalogowanegoUzytkownika;
 
@@ -561,6 +562,7 @@ int main()
     vector <Adresat> adresaci;
     int iloscUzytkownikow = 0;
     int iloscAdresatow = 0;
+    int iloscWszystkichAdresatow = 0;
     int idZalogowanegoUzytkownika = 0;
     char wybor;
 
@@ -590,7 +592,7 @@ int main()
                 break;
             }
 
-            iloscAdresatow = wczytanieZPlikuAdresatow(adresaci, idZalogowanegoUzytkownika);
+            iloscAdresatow = wczytanieZPlikuAdresatow(adresaci, idZalogowanegoUzytkownika, iloscWszystkichAdresatow);
         }
         else
         {
@@ -611,7 +613,7 @@ int main()
             switch(wybor)
             {
             case '1':
-                iloscAdresatow = dodajAdresata(adresaci, iloscAdresatow, idZalogowanegoUzytkownika);
+                iloscAdresatow = dodajAdresata(adresaci, iloscWszystkichAdresatow, iloscAdresatow, idZalogowanegoUzytkownika);
                 break;
             case '2':
                 wyszukajPoImieniu(adresaci, iloscAdresatow);
