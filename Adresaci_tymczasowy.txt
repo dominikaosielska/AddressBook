@@ -1,6 +1,0 @@
-1|2|Pola|Osielska|123 345 567|pola@osielska.com|Osielsko 9|
-2|1|Jakub|Osielski|678 789 789|jakub@osielski.com|Jakubo 3|
-3|1|Pola|Raksa|111 111 111|pola@raksa.com|Polowo 56|
-4|1|Karolina|Len|4556 788 654|karolina@len.com|Lenowo 5|
-5|1|Maciej|Kloc|123 123 123|maciej@kloc.com|Maciejowo 45|
-6|2|Martyna|Osielska|345 234 244|dominika@osielska.com|Dominikowo 23|
