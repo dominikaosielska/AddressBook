@@ -182,14 +182,13 @@ int rejestracja(vector <Uzytkownik> &uzytkownicy, int iloscUzytkownikow)
     return ++iloscUzytkownikow;
 }
 
-int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci, int idZalogowanegoUzytkownika, int &iloscWszystkichAdresatow)
+int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci, int idZalogowanegoUzytkownika, int &maksymalneIDAdresata)
 {
     Adresat adresat;
+    adresaci.clear();
     int iloscAdresatow = 0;
     string linia = "";
     int numerSlowa = 1;
-
-    iloscWszystkichAdresatow = 0;
 
     fstream plik;
     plik.open("Adresaci.txt", ios::in);
@@ -209,7 +208,7 @@ int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci, int idZalogowanegoUzytk
             {
             case 1:
                 adresat.idAdresata = stoi(linia);
-                iloscWszystkichAdresatow++;
+                maksymalneIDAdresata = adresat.idAdresata;
                 break;
             case 2:
                 adresat.idUzytkownika = stoi(linia);
@@ -228,7 +227,7 @@ int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci, int idZalogowanegoUzytk
                 break;
             case 7:
                 adresat.adres = linia;
-                numerSlowa= 0;
+                numerSlowa = 0;
                 break;
             }
             numerSlowa++;
@@ -244,7 +243,7 @@ int wczytanieZPlikuAdresatow(vector <Adresat> &adresaci, int idZalogowanegoUzytk
     return iloscAdresatow;
 }
 
-int dodajAdresata(vector <Adresat> &adresaci, int &iloscWszystkichAdresatow, int iloscAdresatow,  int idZalogowanegoUzytkownika)
+int dodajAdresata(vector <Adresat> &adresaci, int &maksymalneIDAdresata, int iloscAdresatow,  int idZalogowanegoUzytkownika)
 {
     system("cls");
 
@@ -256,7 +255,7 @@ int dodajAdresata(vector <Adresat> &adresaci, int &iloscWszystkichAdresatow, int
     {
         cout << ">>> DODAWANIE OSOBY <<<" << endl << endl;
 
-        adresat.idAdresata = ++iloscWszystkichAdresatow;
+        adresat.idAdresata = ++maksymalneIDAdresata;
 
         adresat.idUzytkownika = idZalogowanegoUzytkownika;
 
@@ -385,27 +384,31 @@ int wyswietlWszystkichAdresatow(vector <Adresat> &adresaci, int iloscAdresatow)
     return 0;
 }
 
-void nadpiszPlik(vector <Adresat> &adresaci)
+void dodajAdresataDoPlikuTymczasowego(Adresat adresat)
 {
-    ofstream plik;
-    plik.open("Adresaci.txt", ofstream::trunc);
 
-    for(Adresat adresat : adresaci)
-    {
-        plik << adresat.idAdresata << '|';
-        plik << adresat.imie << '|';
-        plik << adresat.nazwisko << '|';
-        plik << adresat.numerTelefonu << '|';
-        plik << adresat.email << '|';
-        plik << adresat.adres << '|' << endl;
-    }
+            fstream plik;
+            plik.open("Adresaci_tymczasowy.txt", ios::out | ios::app);
+            plik << adresat.idAdresata << '|';
+            plik << adresat.idUzytkownika << '|';
+            plik << adresat.imie << '|';
+            plik << adresat.nazwisko << '|';
+            plik << adresat.numerTelefonu << '|';
+            plik << adresat.email << '|';
+            plik << adresat.adres << '|' << endl;
 
-    plik.close();
+            plik.close();
+
 }
 
-int usunAdresata(vector <Adresat> &adresaci, int iloscAdresatow)
+void usunAdresata(int idZalogowanegoUzytkownika)
 {
+    Adresat adresat;
     int adresatDoUsuniecia;
+    string linia = "";
+    int numerSlowa = 1;
+    bool czyAdresatUsuniety = false;
+
 
     system("cls");
 
@@ -413,31 +416,74 @@ int usunAdresata(vector <Adresat> &adresaci, int iloscAdresatow)
     cout << "Podaj numer ID adresata, ktorego chcesz usunac: ";
     cin >> adresatDoUsuniecia;
 
-    for(vector <Adresat>:: iterator itr = adresaci.begin(); itr != adresaci.end(); itr++)
+    fstream plik;
+    plik.open("Adresaci.txt", ios::in);
+
+    while(getline(plik, linia))
     {
-        if(itr->idAdresata == adresatDoUsuniecia)
+        stringstream ss (linia);
+
+        while (getline (ss, linia, '|'))
         {
-            adresaci.erase(itr);
-            nadpiszPlik(adresaci);
-
-            if (adresatDoUsuniecia == iloscAdresatow)
-                iloscAdresatow--;
-
-            return iloscAdresatow;
+            switch(numerSlowa)
+            {
+            case 1:
+                adresat.idAdresata = stoi(linia);
+                break;
+            case 2:
+                adresat.idUzytkownika = stoi(linia);
+                break;
+            case 3:
+                adresat.imie = linia;
+                break;
+            case 4:
+                adresat.nazwisko = linia;
+                break;
+            case 5:
+                adresat.numerTelefonu = linia;
+                break;
+            case 6:
+                adresat.email = linia;
+                break;
+            case 7:
+                adresat.adres = linia;
+                numerSlowa= 0;
+                break;
+            }
+            numerSlowa++;
         }
 
+        if(adresat.idUzytkownika == idZalogowanegoUzytkownika && adresat.idAdresata == adresatDoUsuniecia)
+          {
+              cout << endl << "Adresat zostal usuniety" << endl;
+              Sleep(1000);
+              czyAdresatUsuniety = true;
+              continue;
+          }
+          dodajAdresataDoPlikuTymczasowego(adresat);
     }
-    cout << endl << "Nie ma adresata o takim ID" << endl;
-    Sleep(1000);
-    return iloscAdresatow;
 
+    if (czyAdresatUsuniety == false)
+    {
+            cout << endl << "Nie odnaleziono adresata do usuniecia" << endl;
+            Sleep(1000);
+    }
+
+    plik.close();
+
+    remove("Adresaci.txt");
+    rename("Adresaci_tymczasowy.txt", "Adresaci.txt");
 }
 
-int edytujAdresata(vector <Adresat> &adresaci)
+int edytujAdresata(int idZalogowanegoUzytkownika)
 {
+    Adresat adresat;
     int adresatDoEdycji;
     int wybor;
     string nowaDana;
+    string linia = "";
+    int numerSlowa = 1;
+    bool czyAdresatZedytowany = false;
 
     system("cls");
 
@@ -445,9 +491,44 @@ int edytujAdresata(vector <Adresat> &adresaci)
     cout << "Podaj numer ID adresata, ktorego chcesz edytowac: ";
     cin >> adresatDoEdycji;
 
-    for(Adresat &adresat : adresaci)
+    fstream plik;
+    plik.open("Adresaci.txt", ios::in);
+
+    while(getline(plik, linia))
     {
-        if(adresat.idAdresata == adresatDoEdycji)
+        stringstream ss (linia);
+
+        while (getline (ss, linia, '|'))
+        {
+            switch(numerSlowa)
+            {
+            case 1:
+                adresat.idAdresata = stoi(linia);
+                break;
+            case 2:
+                adresat.idUzytkownika = stoi(linia);
+                break;
+            case 3:
+                adresat.imie = linia;
+                break;
+            case 4:
+                adresat.nazwisko = linia;
+                break;
+            case 5:
+                adresat.numerTelefonu = linia;
+                break;
+            case 6:
+                adresat.email = linia;
+                break;
+            case 7:
+                adresat.adres = linia;
+                numerSlowa= 0;
+                break;
+            }
+            numerSlowa++;
+        }
+
+        if (adresat.idUzytkownika == idZalogowanegoUzytkownika && adresat.idAdresata == adresatDoEdycji)
         {
             system("cls");
 
@@ -511,15 +592,30 @@ int edytujAdresata(vector <Adresat> &adresaci)
                 Sleep(1000);
                 return 0;
             }
-            nadpiszPlik(adresaci);
 
-            return 0;
+            dodajAdresataDoPlikuTymczasowego(adresat);
+
+            cout << endl << "Adresat zostal zedytowany" << endl;
+            Sleep(1000);
+            czyAdresatZedytowany = true;
+            continue;
         }
-
+        dodajAdresataDoPlikuTymczasowego(adresat);
     }
 
-    cout << endl << "Nie ma adresata o podanym ID";
-    Sleep(1000);
+    if (czyAdresatZedytowany == false)
+    {
+            cout << endl << "Nie odnaleziono adresata do usuniecia" << endl;
+            Sleep(1000);
+    }
+
+
+
+    plik.close();
+
+    remove("Adresaci.txt");
+    rename("Adresaci_tymczasowy.txt", "Adresaci.txt");
+
     return 0;
 }
 
@@ -562,7 +658,7 @@ int main()
     vector <Adresat> adresaci;
     int iloscUzytkownikow = 0;
     int iloscAdresatow = 0;
-    int iloscWszystkichAdresatow = 0;
+    int maksymalneIDAdresata = 0;
     int idZalogowanegoUzytkownika = 0;
     char wybor;
 
@@ -573,6 +669,8 @@ int main()
         if (idZalogowanegoUzytkownika == 0)
         {
             system("cls");
+
+            cout << ">>> MENU GLOWNE <<<" << endl << endl;
             cout << "1. Logowanie" << endl;
             cout << "2. Rejestracja" << endl;
             cout << "9. Zakoncz program" << endl;
@@ -592,7 +690,7 @@ int main()
                 break;
             }
 
-            iloscAdresatow = wczytanieZPlikuAdresatow(adresaci, idZalogowanegoUzytkownika, iloscWszystkichAdresatow);
+            iloscAdresatow = wczytanieZPlikuAdresatow(adresaci, idZalogowanegoUzytkownika, maksymalneIDAdresata);
         }
         else
         {
@@ -613,7 +711,7 @@ int main()
             switch(wybor)
             {
             case '1':
-                iloscAdresatow = dodajAdresata(adresaci, iloscWszystkichAdresatow, iloscAdresatow, idZalogowanegoUzytkownika);
+                iloscAdresatow = dodajAdresata(adresaci, maksymalneIDAdresata, iloscAdresatow, idZalogowanegoUzytkownika);
                 break;
             case '2':
                 wyszukajPoImieniu(adresaci, iloscAdresatow);
@@ -625,10 +723,11 @@ int main()
                 wyswietlWszystkichAdresatow(adresaci, iloscAdresatow);
                 break;
             case '5':
-                iloscAdresatow = usunAdresata(adresaci, iloscAdresatow);
+                usunAdresata(idZalogowanegoUzytkownika);
+                iloscAdresatow = wczytanieZPlikuAdresatow(adresaci, idZalogowanegoUzytkownika, maksymalneIDAdresata);
                 break;
             case '6':
-                edytujAdresata(adresaci);
+                edytujAdresata(idZalogowanegoUzytkownika);
                 break;
             case '7':
                 zmienHaslo(uzytkownicy, iloscUzytkownikow, idZalogowanegoUzytkownika);
